@@ -7,15 +7,22 @@ document.getElementById('guess-form').addEventListener('submit', async function(
         // Строим URL для страницы приглашения
         const url = `https://lengway.github.io/invitation.html?name=${encodeURIComponent(name)}&guess=${encodeURIComponent(guess)}`;
 
-        // Отправка POST-запроса в API PDFShift
+        // Подготовка авторизации с API ключом
+        const apiKey = "sk_679eea642b0b6e9679b50ec4dc1e23189cfaa90a";  // Вставь свой API ключ
+        const headers = new Headers();
+        headers.append("Authorization", "Basic " + btoa(`api:${apiKey}`));
+        headers.append("Content-Type", "application/json");
+
+        // Отправка запроса на API PDFShift
         try {
-            const response = await fetch("https://api.pdfshift.io/v3/convert", {
+            const response = await fetch("https://api.pdfshift.io/v3/convert/pdf", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Basic " + btoa("sk_679eea642b0b6e9679b50ec4dc1e23189cfaa90a") // Вставь свой API ключ
-                },
-                body: JSON.stringify({ source: url }) // Отправляем ссылку на страницу приглашения
+                headers: headers,
+                body: JSON.stringify({
+                    source: url,  // Отправляем ссылку на страницу
+                    landscape: false,
+                    use_print: false
+                })
             });
 
             if (!response.ok) {
