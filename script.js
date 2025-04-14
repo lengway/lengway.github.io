@@ -18,7 +18,7 @@ document.getElementById('guess-form').addEventListener('submit', async function(
                 body: JSON.stringify({
                     source: url,
                     landscape: false,
-                    use_print: false
+                    use_print: false,
                 })
             });
 
