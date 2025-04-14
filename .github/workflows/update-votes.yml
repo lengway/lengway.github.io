@@ -1,35 +1,63 @@
-name: Update Votes
+name: Process Votes
 
 on:
-  push:
-    paths:
-      - '../../contents/votes.json'
+  issues:
+    types: [opened]
 
 jobs:
-  update-votes:
+  count-votes:
+    if: contains(github.event.issue.labels.*.name, 'vote')
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - name: Get current votes from votes.json
-        id: get_votes
-        run: |
-          CURRENT_VOTES=$(cat votes.json)
-          echo "::set-output name=current_votes::$CURRENT_VOTES"
+      - name: Set up jq
+        run: sudo apt-get install jq
 
-      - name: Update votes
+      - name: Read current votes
+        id: read_votes
         run: |
-          NEW_VOTES="${{ steps.get_votes.outputs.current_votes }}"
-          echo "Updating votes: $NEW_VOTES"
-          # Здесь вы можете добавить код для обновления данных в votes.json
-          echo "$NEW_VOTES" > votes.json
+          boyVotes=$(jq '.boyVotes' contents/votes.json)
+          girlVotes=$(jq '.girlVotes' contents/votes.json)
 
-      - name: Commit changes
+          echo "BOY=$boyVotes" >> $GITHUB_ENV
+          echo "GIRL=$girlVotes" >> $GITHUB_ENV
+
+      - name: Parse issue body and update vote
         run: |
-          git config --global user.email "you@example.com"
-          git config --global user.name "Your Name"
-          git add votes.json
-          git commit -m "Updated votes"
+          echo "${{ github.event.issue.body }}" > body.json
+
+          name=$(jq -r '.name' body.json)
+          vote=$(jq -r '.vote' body.json)
+
+          echo "Голос от $name: $vote"
+
+          if [[ "$vote" == "Мальчик 💙" ]]; then
+            newBoy=$((BOY+1))
+            newGirl=$GIRL
+          elif [[ "$vote" == "Девочка 💖" ]]; then
+            newGirl=$((GIRL+1))
+            newBoy=$BOY
+          else
+            echo "Неверный голос"
+            exit 1
+          fi
+
+          echo "{\"boyVotes\": $newBoy, \"girlVotes\": $newGirl}" > contents/votes.json
+
+      - name: Commit and push
+        run: |
+          git config --global user.email "bot@example.com"
+          git config --global user.name "GenderBot"
+          git add contents/votes.json
+          git commit -m "Update votes from #${{ github.event.issue.number }}"
           git push
+
+      - name: Close issue
+        uses: peter-evans/close-issue@v2
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          comment: |
+            Спасибо за голос, ${{ fromJson(github.event.issue.body)>name}}!
