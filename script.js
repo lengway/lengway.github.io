@@ -1,39 +1,24 @@
-document.getElementById('guess-form').addEventListener('submit', async function (e) {
-    e.preventDefault();
-
-    const name = document.getElementById('name').value;
+document.getElementById('guess-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const name = document.getElementById('name').value.trim();
     const guess = document.getElementById('guess').value;
 
-    if (!name || !guess) return;
+    if (name && guess) {
+        const url = `invitation.html?name=${encodeURIComponent(name)}&guess=${encodeURIComponent(guess)}`;
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'absolute';
+        iframe.style.left = '-9999px';
+        document.body.appendChild(iframe);
 
-    const button = e.target.querySelector('button');
-    button.disabled = true;
-    button.textContent = "Генерация PDF...";
+        iframe.onload = () => {
+            html2pdf().from(iframe.contentDocument.body).save(`${name}_приглашение.pdf`);
+            document.body.removeChild(iframe);
+        };
 
-    try {
-        // Загружаем invitation.html как текст
-        const res = await fetch('invitation.html');
-        let html = await res.text();
+        iframe.src = url;
 
-        // Подставляем имя и выбор прямо в HTML
-        html = html.replace('id="user-name"></strong>', `id="user-name">${name}</strong>`);
-        html = html.replace('id="user-guess"></strong>', `id="user-guess">${guess}</strong>`);
-
-        // Создаём временный контейнер для рендера
-        const container = document.createElement('div');
-        container.innerHTML = html;
-        container.style.display = 'none';
-        document.body.appendChild(container);
-
-        // Генерируем PDF
-        await html2pdf().from(container).save();
-
-        // Удаляем контейнер
-        document.body.removeChild(container);
-    } catch (error) {
-        console.error('Ошибка генерации PDF:', error);
+        // Очистить форму
+        document.getElementById('name').value = '';
+        document.getElementById('guess').value = '';
     }
-
-    button.disabled = false;
-    button.textContent = "Получить приглашение";
 });
