@@ -1,0 +1,35 @@
+name: Update Votes
+
+on:
+  push:
+    paths:
+      - 'votes.json'
+
+jobs:
+  update-votes:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Get current votes from votes.json
+        id: get_votes
+        run: |
+          CURRENT_VOTES=$(cat votes.json)
+          echo "::set-output name=current_votes::$CURRENT_VOTES"
+
+      - name: Update votes
+        run: |
+          NEW_VOTES="${{ steps.get_votes.outputs.current_votes }}"
+          echo "Updating votes: $NEW_VOTES"
+          # Здесь вы можете добавить код для обновления данных в votes.json
+          echo "$NEW_VOTES" > votes.json
+
+      - name: Commit changes
+        run: |
+          git config --global user.email "you@example.com"
+          git config --global user.name "Your Name"
+          git add votes.json
+          git commit -m "Updated votes"
+          git push
