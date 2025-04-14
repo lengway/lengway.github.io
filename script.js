@@ -19,11 +19,6 @@ document.getElementById('guess-form').addEventListener('submit', async function(
                     source: url,
                     landscape: false,
                     use_print: false,
-                    page_size: "letter",
-                    margin_top: 0,
-                    margin_bottom: 0,
-                    margin_left: 0,
-                    margin_right: 0
                 })
             });
 
