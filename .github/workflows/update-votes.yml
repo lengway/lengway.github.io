@@ -3,7 +3,7 @@ name: Update Votes
 on:
   push:
     paths:
-      - 'votes.json'
+      - '../../contents/votes.json'
 
 jobs:
   update-votes:
