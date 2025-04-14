@@ -19,13 +19,11 @@ document.getElementById('guess-form').addEventListener('submit', async function(
                     source: url,
                     landscape: false,
                     use_print: false,
-                    pdf_page_size: 'letter', // Установим размер страницы
-                    pdf_margin_top: 0,       // Убираем верхний отступ
-                    pdf_margin_bottom: 0,    // Убираем нижний отступ
-                    pdf_margin_left: 0,      // Убираем левый отступ
-                    pdf_margin_right: 0,     // Убираем правый отступ
-                    pdf_width: 650,          // Устанавливаем фиксированную ширину
-                    pdf_height: 450          // Устанавливаем фиксированную высоту
+                    page_size: "letter",
+                    margin_top: 0,
+                    margin_bottom: 0,
+                    margin_left: 0,
+                    margin_right: 0
                 })
             });
 
