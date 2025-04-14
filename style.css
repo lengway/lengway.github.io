@@ -11,6 +11,9 @@ body {
     align-items: center;
     justify-content: center;
 }
+button {
+    all: unset;
+}
 .button {
     padding: 12px 24px;
     border: none;
