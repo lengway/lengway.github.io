@@ -21,7 +21,7 @@
 //         document.getElementById('name').value = '';
 //         document.getElementById('guess').value = '';
 //     }
-// });
+//  });
 document.getElementById('guess-form').addEventListener('submit', function(e) {
     e.preventDefault();
 
