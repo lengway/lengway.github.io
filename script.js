@@ -25,25 +25,25 @@
 document.getElementById('guess-form').addEventListener('submit', function(e) {
     e.preventDefault();
 
+    const element = document.querySelector('.card'); // Получаем элемент, который нужно конвертировать в PDF
     const name = document.getElementById('name').value;
     const guess = document.getElementById('guess').value;
 
-    if (!name || !guess) return;
+    const docContent = `
+        <div style="text-align: center;">
+            <h1>Приглашение на гендер-пати</h1>
+            <p><strong>Имя:</strong> ${name}</p>
+            <p><strong>Выбор:</strong> ${guess}</p>
+            <p>🎉 Павел и Анита ждут тебя!</p>
+            <p>📅 Дата: 3 мая в 16:00!</p>
+            <p>📍 Место: Банкетный зал Voyage</p>
+            <p>👕 Дресс-кода нет — просто приходи с настроением!</p>
+        </div>
+    `;
 
-    // Заполняем скрытый блок
-    document.getElementById('pdf-name').textContent = name;
-    document.getElementById('pdf-guess').textContent = guess;
+    const pdfElement = document.createElement('div');
+    pdfElement.innerHTML = docContent;
 
-    const pdfElement = document.getElementById('pdf-content');
-
-    const opt = {
-        margin:       10,
-        filename:     'priglashenie.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    html2pdf().set(opt).from(pdfElement).save();
+    // Генерируем PDF
+    html2pdf().from(pdfElement).save();
 });
-
